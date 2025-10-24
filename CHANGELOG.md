@@ -5,6 +5,45 @@ All notable changes to **Pipecat Flows** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Add support for global functions via the `global_functions` parameter in
+  `FlowManager`. Global functions are available to call from any node in the
+  conversation flow, making it easy to provide common capabilities like help,
+  time checks, or other utilities without duplicating function definitions
+  across nodes.
+
+  Global functions support both `FlowsDirectFunction`s (direct function style)
+  and `FlowsFunctionSchema`s (schema-based approach), allowing you to use
+  either pattern.
+
+  Example usage:
+
+  ```python
+  # Direct function style
+  async def help_function(flow_manager: FlowManager) -> FlowResult:
+      """Provide help information to the user."""
+      return FlowResult(value="Help information...")
+
+  async def get_time(flow_manager: FlowManager) -> FlowResult:
+      """Get the current time."""
+      return FlowResult(value=f"Current time: {datetime.now()}")
+
+  # Create flow manager with global functions
+  flow_manager = FlowManager(
+      task=task,
+      llm=llm,
+      context_aggregator=context_aggregator,
+      global_functions=[help_function, get_time]
+  )
+  ```
+
+  Global functions are automatically mixed in with node-specific functions at
+  each node, so they're always available for the LLM to call regardless of the
+  current conversation state.
+
 ## [0.0.21] - 2025-09-17
 
 ### Added
